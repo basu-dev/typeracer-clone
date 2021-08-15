@@ -1,0 +1,16 @@
+:host {
+}
+input {
+  width: 100%;
+}
+.modal {
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #00000055;
+  font-size: 5rem;
+  display: grid;
+  place-content: center;
+}

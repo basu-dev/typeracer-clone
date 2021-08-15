@@ -1,0 +1,39 @@
+<div class="container">
+  <div *ngIf="timer < 4 && timer > 0" class="modal">
+    <h3>{{ timer }}</h3>
+  </div>
+  <h3>{{ gameStatus | uppercase }}</h3>
+  <input
+    #input
+    class="w-96"
+    type="text"
+    [(ngModel)]="inputValue"
+    (keydown)="keyPressed()"
+    (keyup)="keyPressed()"
+    [disabled]="gameStatus != 'playing'"
+  />
+  <div class="text-right">
+    <button
+      class="p-2 text-center bg-red-500 text-white mt-3 rounded-sm"
+      *ngIf="gameStatus == 'completed'"
+      (click)="restart()"
+    >
+      Play Again
+    </button>
+  </div>
+  <div class="bg-gray-200 rounded-sm py-3 px-3 my-5">
+    <span
+      *ngFor="let item of typingArray; let i = index"
+      [id]="i"
+      class="font-bold"
+      [ngClass]="
+        item.error
+          ? 'text-red-600'
+          : item.completed
+          ? 'text-green-500'
+          : 'text-yellow-600'
+      "
+      >{{ item.text }}</span
+    >
+  </div>
+</div>
