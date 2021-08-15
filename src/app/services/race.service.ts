@@ -24,7 +24,7 @@ export class RaceService {
   }
 
   fetchText(): Observable<Quote> {
-    return this._http.get<Quote>('http://quotes.stormconsultancy.co.uk/random.json');
+    return this._http.get<Quote>('https://quotes.stormconsultancy.co.uk/random.json');
   };
 }
 

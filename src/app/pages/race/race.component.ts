@@ -1,6 +1,7 @@
 import { Quote } from '@angular/compiler';
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { interval, Subscription, timer } from 'rxjs';
+import { LoggerService } from 'src/app/services/logger.service';
 import { PlayObject, RaceService } from 'src/app/services/race.service';
 
 @Component({
@@ -10,9 +11,11 @@ import { PlayObject, RaceService } from 'src/app/services/race.service';
 })
 export class RaceComponent implements OnInit {
 
-  constructor(private _raceService: RaceService) { }
+  constructor(private _raceService: RaceService,
+    private _loggerService: LoggerService
+  ) { }
 
-  @ViewChild('input') input!: ElementRef<HTMLInputElement>;
+  @ViewChild('input', { static: false }) input!: ElementRef<HTMLInputElement>;
   text = "";
   typingArray: PlayObject[] = [];
   gameStatus: 'game starting' | 'playing' | 'completed' = "game starting";
@@ -21,6 +24,10 @@ export class RaceComponent implements OnInit {
   currentObject!: PlayObject;
   currentQuote!: Quote;
 
+  //For speed calculation 
+  totalSeconds = 0;
+  score = 0;
+  scoreInterval: any;
   //Subscriptions 
 
   startInterval!: Subscription;
@@ -34,30 +41,32 @@ export class RaceComponent implements OnInit {
 
   initGame() {
 
+    this.gameStatus = "playing";
     this.typingArray = [];
     this.fetchSubscription = this._raceService.fetchText().subscribe(
       quote => this.typingArray = this._raceService.createRaceObject(quote.quote),
-      err => console.log(err)
+      err => this._loggerService.consoleLog('Data Fetch Error RaceComponent', err)
     );
     this.startTimer();
 
   }
 
   startTimer() {
+
     this.startInterval = interval(1000).subscribe(d => {
       this.timer--;
       if (d > 2) {
         this.startInterval.unsubscribe();
         this.timer = 4;
+
         this.startPlaying();
       }
     });
   }
 
   keyPressed(): any {
-    console.log(this.currentObject);
     let obj = this.currentObject;
-    obj.error = !obj.text.includes(this.inputValue);
+    obj.error = !obj.text?.includes(this.inputValue);
     if (obj.text !== this.inputValue) return;
     obj.completed = true;
     this.inputValue = "";
@@ -69,10 +78,30 @@ export class RaceComponent implements OnInit {
   }
 
   startPlaying() {
-    this.gameStatus = "playing";
-    console.log(this.input);
-    this.input.nativeElement.focus();
+
+
+    this.score = 0;
+    this.totalSeconds = 0;
     this.currentObject = this.typingArray[0];
+
+    this.scoreInterval = setInterval(() => this.calculateScore(), 2000);
+
+    setTimeout(() => {
+      this.input.nativeElement.focus();
+      this.input.nativeElement.select();
+    });
+  }
+
+  calculateScore() {
+
+    if (this.gameStatus == 'completed') {
+      clearInterval(this.scoreInterval);
+
+      return;
+    }
+    this.totalSeconds += 2;
+    let totalWordsTyped = this.typingArray?.indexOf(this.currentObject);
+    this.score = parseInt((totalWordsTyped / (this.totalSeconds / 60)).toString());
   }
 
   restart() {
@@ -81,6 +110,7 @@ export class RaceComponent implements OnInit {
 
   ngOnDestroy() {
     this.fetchSubscription?.unsubscribe();
+    clearInterval(this.scoreInterval);
   }
 
 }
