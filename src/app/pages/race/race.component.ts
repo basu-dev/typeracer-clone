@@ -33,6 +33,10 @@ export class RaceComponent implements OnInit {
   startInterval!: Subscription;
   fetchSubscription!: Subscription;
 
+
+  //error
+  error = false;
+
   ngOnInit(): void {
 
     this.initGame();
@@ -41,13 +45,19 @@ export class RaceComponent implements OnInit {
 
   initGame() {
 
-    this.gameStatus = "playing";
-    this.typingArray = [];
     this.fetchSubscription = this._raceService.fetchText().subscribe(
-      quote => this.typingArray = this._raceService.createRaceObject(quote.quote),
-      err => this._loggerService.consoleLog('Data Fetch Error RaceComponent', err)
+      quote => {
+        this.error = false;
+        this.typingArray = [];
+        this.gameStatus = "playing";
+        this.startTimer();
+        this.typingArray = this._raceService.createRaceObject(quote.quote);
+      },
+      err => {
+        this._loggerService.consoleLog('Data Fetch Error RaceComponent', err);
+        this.error = true;
+      }
     );
-    this.startTimer();
 
   }
 
