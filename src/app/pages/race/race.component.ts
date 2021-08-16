@@ -1,8 +1,7 @@
-import { Quote } from '@angular/compiler';
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { interval, Subscription, timer } from 'rxjs';
 import { LoggerService } from 'src/app/services/logger.service';
-import { PlayObject, RaceService } from 'src/app/services/race.service';
+import { PlayObject, Quote, RaceService } from 'src/app/services/race.service';
 
 @Component({
   selector: 'app-race',
@@ -51,7 +50,7 @@ export class RaceComponent implements OnInit {
         this.typingArray = [];
         this.gameStatus = "playing";
         this.startTimer();
-        this.typingArray = this._raceService.createRaceObject(quote.quote);
+        this.typingArray = this._raceService.createRaceObject(quote.text!);
       },
       err => {
         this._loggerService.consoleLog('Data Fetch Error RaceComponent', err);

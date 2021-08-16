@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -22,9 +23,11 @@ export class RaceService {
     );
     return playObject;
   }
-
+  // api1 = https://quotes.stormconsultancy.co.uk/random.json
   fetchText(): Observable<Quote> {
-    return this._http.get<Quote>('https://quotes.stormconsultancy.co.uk/random.json');
+    return this._http.get<Quote[]>('https://goquotes-api.herokuapp.com/api/v1/random?count=1').pipe(
+      map((response: any) => response.quotes[0])
+    );
   };
 }
 
@@ -39,5 +42,6 @@ export interface PlayObject {
 
 export interface Quote {
   quote: string,
+  text?: string,
   author: string,
 }
