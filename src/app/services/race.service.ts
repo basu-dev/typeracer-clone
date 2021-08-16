@@ -13,8 +13,9 @@ export class RaceService {
   ) { }
 
   createRaceObject(text: string): PlayObject[] {
-    let playObject = text.split(' ').map((item: string, id: number) => <PlayObject>{
-      text: (id + 2 == text.length) ? item : item + ' ',
+    const splittedText = text.split(' ');
+    const playObject = splittedText.map((item: string, id: number) => <PlayObject>{
+      text: (id + 1 == splittedText.length) ? item : item + ' ',
       id,
       error: false,
       completed: false,
