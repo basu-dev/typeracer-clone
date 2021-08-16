@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { interval, Subscription, timer } from 'rxjs';
 import { LoggerService } from 'src/app/services/logger.service';
-import { PlayObject, Quote, RaceService } from 'src/app/services/race.service';
+import { LetterObject, PlayObject, Quote, RaceService } from 'src/app/services/race.service';
 
 @Component({
   selector: 'app-race',
@@ -36,6 +36,12 @@ export class RaceComponent implements OnInit {
   //error
   error = false;
 
+
+  // For letter correct
+  currentLetters: Set<LetterObject> = new Set<LetterObject>();
+  currentLetterId!: number;
+  errorLetters: string[] = [];
+
   ngOnInit(): void {
 
     this.initGame();
@@ -43,14 +49,16 @@ export class RaceComponent implements OnInit {
   }
 
   initGame() {
-
     this.fetchSubscription = this._raceService.fetchText().subscribe(
       quote => {
         this.error = false;
-        this.typingArray = [];
+        this.emptyAll();
         this.gameStatus = "playing";
-        this.startTimer();
         this.typingArray = this._raceService.createRaceObject(quote.text!);
+
+        this._loggerService.consoleLog("RaceComponent", this.typingArray);
+
+        this.startTimer();
       },
       err => {
         this._loggerService.consoleLog('Data Fetch Error RaceComponent', err);
@@ -60,39 +68,65 @@ export class RaceComponent implements OnInit {
 
   }
 
-  startTimer() {
-
-    this.startInterval = interval(1000).subscribe(d => {
-      this.timer--;
-      if (d > 2) {
-        this.startInterval.unsubscribe();
-        this.timer = 4;
-
-        this.startPlaying();
-      }
-    });
+  emptyAll() {
+    this.currentLetters?.clear();
+    this.typingArray = [];
+    this.currentLetterId = -1;
   }
 
-  keyPressed(): any {
+  startTimer() {
+
+    this.startPlaying();
+    // this.startInterval = interval(1000).subscribe(d => {
+    //   this.timer--;
+    //   if (d > 2) {
+    //     this.startInterval.unsubscribe();
+    //     this.timer = 4;
+
+    //     this.startPlaying();
+    //   }
+    // });
+  }
+
+  keyPressed(event: KeyboardEvent): any {
     let obj = this.currentObject;
     obj.error = !obj.text?.includes(this.inputValue);
+
+    this.handleLetters(obj, event);
+
     if (obj.text !== this.inputValue) return;
+
     obj.completed = true;
+
     this.inputValue = "";
+
     if (obj.id + 1 == this.typingArray.length) {
       this.currentObject = <PlayObject>{};
       return this.gameStatus = "completed";
     }
+
     this.currentObject = this.typingArray[obj.id + 1];
   }
 
+  handleLetters(obj: PlayObject, event: KeyboardEvent) {
+
+
+    const index = this.inputValue.length;
+    if (index == 0) return this.currentLetterId = -1;
+    this.currentLetterId = obj?.letters[index - 1]?.id ?? this.currentLetterId;
+
+    return;
+    // if (obj.text === this.inputValue) return this.currentLetters?.clear();
+    // if (event.keyCode != 8) return this.currentLetters?.add(obj?.letters[index - 1]);
+    // if (!event.ctrlKey) return this.currentLetters?.delete(obj.letters[index]);
+    // return this.currentLetters.clear();
+  }
+
+
   startPlaying() {
-
-
     this.score = 0;
     this.totalSeconds = 0;
     this.currentObject = this.typingArray[0];
-
     this.scoreInterval = setInterval(() => this.calculateScore(), 2000);
 
     setTimeout(() => {
@@ -105,7 +139,6 @@ export class RaceComponent implements OnInit {
 
     if (this.gameStatus == 'completed') {
       clearInterval(this.scoreInterval);
-
       return;
     }
     this.totalSeconds += 2;

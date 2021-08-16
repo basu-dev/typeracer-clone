@@ -9,13 +9,13 @@
       placeholder="Type Here ..."
       class="rounded-sm border-1 border-gray-300 block"
       [(ngModel)]="inputValue"
-      (keydown)="keyPressed()"
       [disabled]="gameStatus != 'playing'"
       [autofocus]="true"
-      (keyup)="keyPressed()"
+      (keyup)="keyPressed($event)"
+      (keydown)="keyPressed($event)"
     />
-    <div class="ml-3 p-3 font-semibold text-center bg-gray-200 rounded-sm">
-      <span class="text-lg"> {{ score }} </span>WPM
+    <div class="ml-3 p-3 text-center bg-gray-200 rounded-sm">
+      <span class="text-xl font-semibold"> {{ score }} </span>WPM
     </div>
   </div>
   <div
@@ -25,15 +25,19 @@
     <span
       *ngFor="let item of typingArray; let i = index"
       [id]="i"
-      class="font-semibold"
-      [ngClass]="
-        item.error
-          ? 'text-red-600'
-          : item.completed
-          ? 'text-green-500'
-          : 'text-yellow-600'
-      "
-      >{{ item.text }}</span
+      class="text-xl"
+      [ngClass]="item.completed ? 'text-green-500' : 'text-yellow-600'"
+      ><span
+        *ngFor="let letter of item.letters; let i = index"
+        [ngClass]="
+          !item.error && letter.id <= currentLetterId
+            ? 'text-green-600'
+            : item.error && letter.id <= currentLetterId
+            ? 'text-red-600'
+            : ''
+        "
+        >{{ letter.letter }}</span
+      ></span
     >
   </div>
 
