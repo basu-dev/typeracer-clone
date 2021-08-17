@@ -26,7 +26,7 @@ export class RaceComponent implements OnInit {
   //For speed calculation 
   totalSeconds = 0;
   score = 0;
-  scoreInterval: any;
+  scoreInterval!: Subscription;
   //Subscriptions 
 
   startInterval!: Subscription;
@@ -102,14 +102,15 @@ export class RaceComponent implements OnInit {
 
     if (obj.id + 1 == this.typingArray.length) {
       this.currentObject = <PlayObject>{};
-      return this.gameStatus = "completed";
+      this.gameStatus = "completed";
+      return this.calculateScore();
+
     }
 
     this.currentObject = this.typingArray[obj.id + 1];
   }
 
   handleLetters(obj: PlayObject, event: KeyboardEvent) {
-
 
     const index = this.inputValue.length;
     if (index == 0) return this.currentLetterId = -1;
@@ -127,7 +128,7 @@ export class RaceComponent implements OnInit {
     this.score = 0;
     this.totalSeconds = 0;
     this.currentObject = this.typingArray[0];
-    this.scoreInterval = setInterval(() => this.calculateScore(), 2000);
+    this.scoreInterval = interval(2000).subscribe(() => this.calculateScore());
 
     setTimeout(() => {
       this.input.nativeElement.focus();
@@ -138,7 +139,7 @@ export class RaceComponent implements OnInit {
   calculateScore() {
 
     if (this.gameStatus == 'completed') {
-      clearInterval(this.scoreInterval);
+      this.scoreInterval?.unsubscribe();
       return;
     }
     this.totalSeconds += 2;
@@ -152,7 +153,8 @@ export class RaceComponent implements OnInit {
 
   ngOnDestroy() {
     this.fetchSubscription?.unsubscribe();
-    clearInterval(this.scoreInterval);
+    this.scoreInterval?.unsubscribe();
   }
+
 
 }

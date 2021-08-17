@@ -1,5 +1,11 @@
-:host {
+.racepage {
+  background: #4e6ef1;
+  min-height: 100vh;
 }
+.container {
+  height: 70vh;
+}
+
 input {
   width: 100%;
 }
@@ -13,4 +19,15 @@ input {
   font-size: 5rem;
   display: grid;
   place-content: center;
+}
+.letter-cursor {
+  position: relative;
+}
+
+.secondary-bg {
+  background: #00000044;
+  // color: white;
+}
+.underline {
+  text-decoration-thickness: 1px;
 }

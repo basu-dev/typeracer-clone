@@ -1,3 +1,7 @@
-.container {
-  height: 100vh;
+.background {
+  background-image: url("/assets/images/background.svg");
+  min-height: 100vh;
+  background-position: bottom left;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
