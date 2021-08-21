@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RaceService } from './services/race.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,24 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'typeracer';
+  constructor() {
+
+  }
+  ngOnInit() {
+
+    // if (typeof Worker !== 'undefined') {
+    //   // this._raceService.initWorker();
+    //   // Create a new
+    // } else {
+    //   // Web Workers are not supported in this environment.
+    //   // You should add a fallback so that your program still executes correctly.
+    // }
+    // console.clear();
+
+  }
+  ngOnDestroy() {
+    // console.log('on destroy called');
+    // this._raceService.terminateWorker();
+  }
+
 }

@@ -1,7 +1,10 @@
+import { Quote } from '@angular/compiler';
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { interval, Subscription, timer } from 'rxjs';
 import { LoggerService } from 'src/app/services/logger.service';
-import { LetterObject, PlayObject, Quote, RaceService } from 'src/app/services/race.service';
+import { RaceService } from 'src/app/services/race.service';
+import { WM } from 'src/app/workerMessage';
+import { PlayObject, LetterObject } from '../models/playobject.model';
 
 @Component({
   selector: 'app-race',
@@ -55,7 +58,7 @@ export class RaceComponent implements OnInit {
         this.emptyAll();
         this.gameStatus = "playing";
         this.typingArray = this._raceService.createRaceObject(quote.text!);
-
+        console.log(quote);
         this._loggerService.consoleLog("RaceComponent", this.typingArray);
 
         this.startTimer();
@@ -128,6 +131,8 @@ export class RaceComponent implements OnInit {
     this.score = 0;
     this.totalSeconds = 0;
     this.currentObject = this.typingArray[0];
+
+    // this._raceService.postMessage(WM.calculateScore$, { typingArray: this.typingArray });
     this.scoreInterval = interval(2000).subscribe(() => this.calculateScore());
 
     setTimeout(() => {
@@ -142,10 +147,15 @@ export class RaceComponent implements OnInit {
       this.scoreInterval?.unsubscribe();
       return;
     }
+    // if (this._raceService.workerSupported) return this.calculateWithWorker();
     this.totalSeconds += 2;
     let totalWordsTyped = this.typingArray?.indexOf(this.currentObject);
     this.score = parseInt((totalWordsTyped / (this.totalSeconds / 60)).toString());
   }
+
+  // calculateWithWorker() {
+  //   this._raceService.postMessage(WM.calculateScore$, this.currentObject);
+  // }
 
   restart() {
     this.initGame();

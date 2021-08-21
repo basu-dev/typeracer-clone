@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from "rxjs/operators";
+import { LetterObject, PlayObject, Quote } from '../pages/models/playobject.model';
+import { WM, WorkerMessage } from "../workerMessage";
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +13,7 @@ export class RaceService {
   constructor(
     private _http: HttpClient
   ) { }
+
 
   createRaceObject(text: string): PlayObject[] {
     const splittedText = text.split(' ');
@@ -37,27 +40,6 @@ export class RaceService {
     return this._http.get<Quote[]>('https://goquotes-api.herokuapp.com/api/v1/random?count=1').pipe(
       map((response: any) => response.quotes[0])
     );
+
   };
-}
-
-
-export interface PlayObject {
-  text: string,
-  id: number,
-  error?: boolean,
-  letters: LetterObject[],
-  success?: boolean,
-  completed?: boolean;
-}
-
-export interface LetterObject {
-  letter: string,
-  id: number;
-
-}
-
-export interface Quote {
-  quote: string,
-  text?: string,
-  author: string,
 }
