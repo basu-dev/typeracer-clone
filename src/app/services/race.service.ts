@@ -36,10 +36,17 @@ export class RaceService {
   }
 
   // api1 = https://quotes.stormconsultancy.co.uk/random.json
-  fetchText(): Observable<Quote> {
-    return this._http.get<Quote[]>('https://goquotes-api.herokuapp.com/api/v1/random?count=1').pipe(
-      map((response: any) => response.quotes[0])
-    );
+  // fetchText(): Observable<Quote> {
+  //   return this._http.get<Quote[]>('https://goquotes-api.herokuapp.com/api/v1/random?count=1').pipe(
+  //     map((response: any) => response.quotes[0])
+  //   );
 
-  };
+  fetchText(): Observable<Quote> {
+    return this._http.get<any>("https://random-word-api.herokuapp.com/word?number=20").pipe(
+      map(res => <Quote>{
+        text: res.join(' ')
+      })
+    );
+  }
+
 }
