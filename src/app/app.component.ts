@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ApplicationRef, Component } from '@angular/core';
 import { RaceService } from './services/race.service';
 
 @Component({
@@ -8,11 +8,15 @@ import { RaceService } from './services/race.service';
 })
 export class AppComponent {
   title = 'typeracer';
-  constructor() {
+  constructor(private ref: ApplicationRef) {
 
   }
+  routeActivated() {
+    this.ref.tick();
+    console.log('ref ticked');
+  }
   ngOnInit() {
-
+    console.log('hello');
     // if (typeof Worker !== 'undefined') {
     //   // this._raceService.initWorker();
     //   // Create a new

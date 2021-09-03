@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { map } from "rxjs/operators";
 import { LetterObject, PlayObject, Quote } from '../pages/models/playobject.model';
 import { WM, WorkerMessage } from "../workerMessage";
@@ -11,8 +11,8 @@ import { WM, WorkerMessage } from "../workerMessage";
 export class RaceService {
 
   constructor(
-    private _http: HttpClient
   ) { }
+
 
 
   createRaceObject(text: string): PlayObject[] {
@@ -41,12 +41,22 @@ export class RaceService {
   //     map((response: any) => response.quotes[0])
   //   );
 
+  // fetchText(): Observable<Quote> {
+  //   return this._http.get<any>("https://random-word-api.herokuapp.com/word?number=20").pipe(
+  //     map(res => <Quote>{
+  //       text: res.join(' ')
+  //     })
+  //   );
+  // }
+
   fetchText(): Observable<Quote> {
-    return this._http.get<any>("https://random-word-api.herokuapp.com/word?number=20").pipe(
-      map(res => <Quote>{
-        text: res.join(' ')
-      })
-    );
+    return from(fetch('https://random-word-api.herokuapp.com/word?number=20').then(res => res.json()))
+      .pipe(
+        map(res => <Quote>{
+          text: res.join(' ')
+        })
+      );
   }
+
 
 }

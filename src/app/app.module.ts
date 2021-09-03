@@ -18,7 +18,6 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
     HeaderComponent
   ],
   imports: [
-    HttpClientModule,
     FormsModule,
     BrowserModule,
     AppRoutingModule

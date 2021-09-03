@@ -1,9 +1,9 @@
 import { Quote } from '@angular/compiler';
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { interval, Subscription, timer } from 'rxjs';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { interval, Subscription } from 'rxjs';
+import { Property } from 'src/app/ng-property';
 import { LoggerService } from 'src/app/services/logger.service';
 import { RaceService } from 'src/app/services/race.service';
-import { WM } from 'src/app/workerMessage';
 import { PlayObject, LetterObject } from '../models/playobject.model';
 
 @Component({
@@ -18,17 +18,16 @@ export class RaceComponent implements OnInit {
   ) { }
 
   @ViewChild('input', { static: false }) input!: ElementRef<HTMLInputElement>;
-  text = "";
-  typingArray: PlayObject[] = [];
+  @Property() typingArray: PlayObject[] = [];
   gameStatus: 'game starting' | 'playing' | 'completed' = "game starting";
   timer: number = 4;
-  inputValue = "";
+  @Property() inputValue = "";
   currentObject!: PlayObject;
   currentQuote!: Quote;
 
   //For speed calculation 
   totalSeconds = 0;
-  score = 0;
+  @Property() score = 0;
   scoreInterval!: Subscription;
   //Subscriptions 
 
@@ -37,12 +36,11 @@ export class RaceComponent implements OnInit {
 
 
   //error
-  error = false;
-
+  @Property() error = false;
 
   // For letter correct
   currentLetters: Set<LetterObject> = new Set<LetterObject>();
-  currentLetterId!: number;
+  @Property() currentLetterId!: number;
   errorLetters: string[] = [];
 
   ngOnInit(): void {
