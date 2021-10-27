@@ -2,9 +2,11 @@ import { Quote } from '@angular/compiler';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import { Property } from 'src/app/ng-property';
-import { LoggerService } from 'src/app/services/logger.service';
-import { RaceService } from 'src/app/services/race.service';
-import { PlayObject, LetterObject } from '../models/playobject.model';
+import { LoggerService } from 'src/app/modules/shared/services/logger.service';
+import { RaceService } from 'src/app/modules/racing/services/race/race.service';
+import { PlayObject, LetterObject } from '../../../../models/playobject.model';
+import { UiService } from 'src/app/modules/shared/services/ui/ui.service';
+import { ActivatedRoute, Params } from '@angular/router';
 
 @Component({
   selector: 'app-race',
@@ -14,59 +16,73 @@ import { PlayObject, LetterObject } from '../models/playobject.model';
 export class RaceComponent implements OnInit {
 
   constructor(private _raceService: RaceService,
-    private _loggerService: LoggerService
-  ) { }
+    private _uiService: UiService,
+    private _loggerService: LoggerService,
+    private route: ActivatedRoute
+  ) {
+
+    this.route.queryParams.subscribe((d: Params) => this.gameType = d['type']);
+  }
+
+  gameType: 'normal' | 'difficult' = 'normal';
 
   @ViewChild('input', { static: false }) input!: ElementRef<HTMLInputElement>;
-  @Property() typingArray: PlayObject[] = [];
+  typingArray: PlayObject[] = [];
   gameStatus: 'game starting' | 'playing' | 'completed' = "game starting";
   timer: number = 4;
-  @Property() inputValue = "";
+  inputValue = "";
   currentObject!: PlayObject;
   currentQuote!: Quote;
 
   //For speed calculation 
   totalSeconds = 0;
-  @Property() score = 0;
+  score = 0;
   scoreInterval!: Subscription;
   //Subscriptions 
 
   startInterval!: Subscription;
   fetchSubscription!: Subscription;
 
-
   //error
-  @Property() error = false;
+  error = false;
+  typingError = false;
 
   // For letter correct
   currentLetters: Set<LetterObject> = new Set<LetterObject>();
-  @Property() currentLetterId!: number;
+  currentLetterId!: number;
   errorLetters: string[] = [];
 
   ngOnInit(): void {
-
     this.initGame();
-
   }
 
   initGame() {
-    this.fetchSubscription = this._raceService.fetchText().subscribe(
+    let sub;
+    if (this.gameType == 'difficult') {
+      sub = this._raceService.fetchText();
+    }
+    else {
+      sub = this._raceService.fetchQuotes();
+    }
+    this._uiService.loading.startLoading();
+    this.fetchSubscription = sub.subscribe(
       quote => {
         this.error = false;
         this.emptyAll();
         this.gameStatus = "playing";
         this.typingArray = this._raceService.createRaceObject(quote.text!);
-        console.log(quote);
-        this._loggerService.consoleLog("RaceComponent", this.typingArray);
-
+        this._uiService.loading.stopLoading();
         this.startTimer();
       },
       err => {
+        if (this.gameType = "normal") {
+          this.gameType = "difficult";
+          return this.initGame();
+        };
         this._loggerService.consoleLog('Data Fetch Error RaceComponent', err);
         this.error = true;
       }
     );
-
   }
 
   emptyAll() {
@@ -76,22 +92,12 @@ export class RaceComponent implements OnInit {
   }
 
   startTimer() {
-
     this.startPlaying();
-    // this.startInterval = interval(1000).subscribe(d => {
-    //   this.timer--;
-    //   if (d > 2) {
-    //     this.startInterval.unsubscribe();
-    //     this.timer = 4;
-
-    //     this.startPlaying();
-    //   }
-    // });
   }
 
   keyPressed(event: KeyboardEvent): any {
     let obj = this.currentObject;
-    obj.error = !obj.text?.includes(this.inputValue);
+    this.typingError = obj.error = (obj.text?.indexOf(this.inputValue) != 0);
 
     this.handleLetters(obj, event);
 
@@ -118,10 +124,6 @@ export class RaceComponent implements OnInit {
     this.currentLetterId = obj?.letters[index - 1]?.id ?? this.currentLetterId;
 
     return;
-    // if (obj.text === this.inputValue) return this.currentLetters?.clear();
-    // if (event.keyCode != 8) return this.currentLetters?.add(obj?.letters[index - 1]);
-    // if (!event.ctrlKey) return this.currentLetters?.delete(obj.letters[index]);
-    // return this.currentLetters.clear();
   }
 
 

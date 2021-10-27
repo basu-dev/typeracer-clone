@@ -2,9 +2,9 @@ import { ɵmarkDirty } from "@angular/core";
 
 /**
  * 
- * When you decorate a property with @Property() decorator, the change of the property will cause changeDetection.
+ * When you decorate a property with  decorator, the change of the property will cause changeDetection.
  * It callse ɵmarkDirty  under the hood.
- * If you dont want to run change detection on change of sertain property then dont decorate it with @Property() decorator.
+ * If you dont want to run change detection on change of sertain property then dont decorate it with  decorator.
  */
 export function Property<T>() {
     let _val: T;

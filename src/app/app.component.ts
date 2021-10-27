@@ -1,5 +1,6 @@
-import { ApplicationRef, Component } from '@angular/core';
-import { RaceService } from './services/race.service';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
+import { UiService } from './modules/shared/services/ui/ui.service';
 
 @Component({
   selector: 'app-root',
@@ -8,28 +9,37 @@ import { RaceService } from './services/race.service';
 })
 export class AppComponent {
   title = 'typeracer';
-  constructor(private ref: ApplicationRef) {
+  constructor(private router: Router, private _uiService: UiService, private _cdr: ChangeDetectorRef) {
 
   }
-  routeActivated() {
-    this.ref.tick();
-    console.log('ref ticked');
-  }
+  loading = true;
   ngOnInit() {
-    console.log('hello');
-    // if (typeof Worker !== 'undefined') {
-    //   // this._raceService.initWorker();
-    //   // Create a new
-    // } else {
-    //   // Web Workers are not supported in this environment.
-    //   // You should add a fallback so that your program still executes correctly.
-    // }
-    // console.clear();
+    this.listenRouterEvents();
+    this.listenLoading();
+    console.clear();
+  }
 
+  listenLoading() {
+    this._uiService.loading.loadingSub$.subscribe(d => {
+      this.loading = d;
+      this._cdr.detectChanges();
+    });
+  }
+
+  listenRouterEvents() {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        this.loading = true;
+      } else if (event instanceof NavigationEnd) {
+        this.loading = false;
+      } else if (event instanceof NavigationCancel) {
+        this.loading = false;
+      } else if (event instanceof NavigationError) {
+        this.loading = false;
+      }
+    });
   }
   ngOnDestroy() {
-    // console.log('on destroy called');
-    // this._raceService.terminateWorker();
   }
 
 }

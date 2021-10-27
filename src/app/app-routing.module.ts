@@ -1,14 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
-import { RaceComponent } from './pages/race/race.component';
+import { HomeModule } from './modules/home/home.module';
 
 const routes: Routes = [
   {
-    path: '', component: HomeComponent,
+    path: '', loadChildren: () => HomeModule
   },
   {
-    path: 'race', component: RaceComponent,
+    path: 'race', loadChildren: () => import("./modules/racing/racing.module").then(module => module.RacingModule)
   }
 ];
 

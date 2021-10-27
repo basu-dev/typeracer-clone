@@ -6,62 +6,38 @@
         <h3>{{ timer }}</h3>
       </div>
       <div class="flex">
-        <input
-          #input
-          type="text"
-          placeholder="Type Here ..."
-          class="
+        <input #input type="text" placeholder="Type Here ..." class="
             rounded-sm
             border-1
             text-gray-700
             border-gray-200
             block
-            bg-blue-50
             text-lg
-          "
-          [(ngModel)]="inputValue"
-          [disabled]="gameStatus != 'playing'"
-          [autofocus]="true"
-          (keyup)="keyPressed($event)"
-          (keydown)="keyPressed($event)"
-        />
+          " [(ngModel)]="inputValue" [ngClass]="typingError?'bg-red-300':'bg-blue-50'"
+          [disabled]="gameStatus != 'playing'" [autofocus]="true" (keyup)="keyPressed($event)"
+          (keydown)="keyPressed($event)" />
         <div class="ml-3 p-3 text-center secondary-bg rounded-sm">
           <span class="text-xl font-semibold"> {{ score }} </span>WPM
         </div>
       </div>
-      <div
-        *ngIf="typingArray.length > 0"
-        class="secondary-bg rounded-sm py-3 px-3 my-5"
-      >
-        <span
-          *ngFor="let item of typingArray; let i = index"
-          [id]="i"
-          class="text-2xl"
-          [ngClass]="item.id == currentObject.id ? 'underline' : ''"
-          [ngClass]="item.completed ? 'text-green-450' : ''"
-          ><span
-            *ngFor="let letter of item.letters; let i = index"
+      <div *ngIf="typingArray.length > 0" class="bg-gray-200 text-gray-700 rounded-sm py-3 px-3 my-5">
+        <span *ngFor="let item of typingArray; let i = index" [id]="i" class="text-2xl"
+          [ngClass]="item?.id == currentObject?.id ? 'underline' : ''"
+          [ngClass]="item.completed ? 'text-blue-600' : ''"><span *ngFor="let letter of item.letters; let i = index"
             [class]="
-              letter.id == currentLetterId + 1
+              letter?.id == currentLetterId + 1
                 ? 'letter letter-cursor'
                 : 'letter'
-            "
-            [ngClass]="
+            " [ngClass]="
               !item.error && letter.id <= currentLetterId
-                ? 'text-green-450'
+                ? 'text-blue-500'
                 : item.error && letter.id <= currentLetterId
                 ? 'text-red-500 '
                 : ''
-            "
-            >{{ letter.letter }}</span
-          ></span
-        >
+            ">{{ letter.letter }}</span></span>
       </div>
       <div class="text-center pt-4">
-        <a
-          *ngIf="gameStatus == 'completed'"
-          (click)="restart()"
-          class="
+        <a *ngIf="gameStatus == 'completed'" (click)="restart()" class="
             cursor-pointer
             bg-gray-200
             hover:bg-blue-700 hover:text-gray-200
@@ -72,9 +48,7 @@
             font-bold
             text-blue-700
             rounded-full
-          "
-          >Next Race</a
-        >
+          ">Next Race</a>
       </div>
     </div>
   </div>

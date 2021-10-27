@@ -1,9 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
-import { map } from "rxjs/operators";
-import { LetterObject, PlayObject, Quote } from '../pages/models/playobject.model';
-import { WM, WorkerMessage } from "../workerMessage";
+import { map, tap } from "rxjs/operators";
+import { LetterObject, PlayObject, Quote } from '../../../../models/playobject.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +11,8 @@ export class RaceService {
   constructor(
   ) { }
 
-
+  DIFFICULT_TEXT_KEY = "difficultText";
+  NORMAL_TEXT_KEY = "normalText";
 
   createRaceObject(text: string): PlayObject[] {
     const splittedText = text.split(' ');
@@ -36,18 +35,11 @@ export class RaceService {
   }
 
   // api1 = https://quotes.stormconsultancy.co.uk/random.json
-  // fetchText(): Observable<Quote> {
-  //   return this._http.get<Quote[]>('https://goquotes-api.herokuapp.com/api/v1/random?count=1').pipe(
-  //     map((response: any) => response.quotes[0])
-  //   );
-
-  // fetchText(): Observable<Quote> {
-  //   return this._http.get<any>("https://random-word-api.herokuapp.com/word?number=20").pipe(
-  //     map(res => <Quote>{
-  //       text: res.join(' ')
-  //     })
-  //   );
-  // }
+  fetchQuotes(): Observable<Quote> {
+    return from(fetch('https://goquotes-api.herokuapp.com/api/v1/random?count=1').then(res => res.json())).pipe(
+      map((response: any) => response.quotes[0])
+    );
+  }
 
   fetchText(): Observable<Quote> {
     return from(fetch('https://random-word-api.herokuapp.com/word?number=20').then(res => res.json()))
@@ -57,6 +49,16 @@ export class RaceService {
         })
       );
   }
+
+  saveDifficultText(res: any) {
+    console.log(res);
+    let items = JSON.parse(localStorage.getItem(this.DIFFICULT_TEXT_KEY)!) ?? [];
+    items.push(res);
+    localStorage.setItem(this.DIFFICULT_TEXT_KEY, items);
+    return;
+  }
+
+
 
 
 }

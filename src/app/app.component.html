@@ -1,5 +1,23 @@
 <main class="bg-gray-100">
-  <div class="">
-    <router-outlet (activate)="routeActivated()"></router-outlet>
-  </div>
+  <ng-container *ngIf="loading">
+
+    <div class="loader">
+      <div class="lds-spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+
+  </ng-container>
+  <router-outlet></router-outlet>
 </main>
