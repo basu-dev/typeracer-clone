@@ -166,5 +166,8 @@ export class RaceComponent implements OnInit {
     this.scoreInterval?.unsubscribe();
   }
 
+  handleOnPaste(e: any) {
+    e.preventDefault();
+  }
 
 }

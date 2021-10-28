@@ -15,12 +15,12 @@
             text-lg
           " [(ngModel)]="inputValue" [ngClass]="typingError?'bg-red-300':'bg-blue-50'"
           [disabled]="gameStatus != 'playing'" [autofocus]="true" (keyup)="keyPressed($event)"
-          (keydown)="keyPressed($event)" />
+          (keydown)="keyPressed($event)" (paste)="handleOnPaste($event)" />
         <div class="ml-3 p-3 text-center secondary-bg rounded-sm">
           <span class="text-xl font-semibold"> {{ score }} </span>WPM
         </div>
       </div>
-      <div *ngIf="typingArray.length > 0" class="bg-gray-200 text-gray-700 rounded-sm py-3 px-3 my-5">
+      <div *ngIf="typingArray.length > 0" class="bg-gray-200 text-gray-700 rounded-sm py-3 px-3 select-none my-5">
         <span *ngFor="let item of typingArray; let i = index" [id]="i" class="text-2xl"
           [ngClass]="item?.id == currentObject?.id ? 'underline' : ''"
           [ngClass]="item.completed ? 'text-blue-600' : ''"><span *ngFor="let letter of item.letters; let i = index"
