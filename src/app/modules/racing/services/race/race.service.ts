@@ -42,7 +42,7 @@ export class RaceService {
   }
 
   fetchText(): Observable<Quote> {
-    return from(fetch('https://random-word-api.herokuapp.com/word?number=20').then(res => res.json()))
+    return from(fetch('https://random-word-api.herokuapp.com/word?number=200000').then(res => res.json()))
       .pipe(
         map(res => <Quote>{
           text: res.join(' ')
