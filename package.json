@@ -7,8 +7,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:prod": "cross-env NODE_ENV=production  node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build --configuration production",
-    "build-prod": "cross-env NODE_ENV=production ng build --configuration production"
+    "build4": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build",
+    "build:scully": "npm run build4 && npx scully",
+    "scully": "npx scully --",
+    "scully:serve": "npx scully serve --"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +22,10 @@
     "@angular/platform-browser": "~13.0.2",
     "@angular/platform-browser-dynamic": "~13.0.2",
     "@angular/router": "~13.0.2",
+    "@scullyio/init": "^2.0.5",
+    "@scullyio/ng-lib": "^2.0.0",
+    "@scullyio/scully": "^2.0.0",
+    "@scullyio/scully-plugin-puppeteer": "^2.0.0",
     "autoprefixer": "^10.3.1",
     "ng-property": "^0.0.2",
     "postcss": "^8.3.6",

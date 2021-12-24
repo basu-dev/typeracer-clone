@@ -72,7 +72,6 @@ export class RaceComponent implements OnInit {
       .pipe(takeUntil(this.closeSubs$))
       .subscribe(
         quote => {
-          alert('Done');
           this.error = false;
           this.emptyAll();
           this.gameStatus = GameStatus.Playing;

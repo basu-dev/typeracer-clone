@@ -1,6 +1,9 @@
 module.exports = {
   // mode: 'jit',
-  purge: ["./src/**/*.{html,ts}"],
+  purge: {
+    enabled: process?.argv?.indexOf("build") !== -1,
+    content: ["./src/**/*.{html,ts}"],
+  },
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {

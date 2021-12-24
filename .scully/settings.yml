@@ -1,0 +1,11 @@
+identifier: k1x8kbp1t5e2mcqb
+appPort: 1864
+staticPort: 1668
+reloadPort: 2667
+hostName: localhost
+projectName: typeracer
+homeFolder: /home/dev/Desktop/angular/typeracer-clone
+distFolder: dist/typeracer
+outDir: /home/dev/Desktop/angular/typeracer-clone/dist/static
+handle404: ''
+allowErrorCollect: true
