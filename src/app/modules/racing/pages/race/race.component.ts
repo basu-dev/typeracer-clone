@@ -1,12 +1,13 @@
 import { Quote } from '@angular/compiler';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { interval, Subscription } from 'rxjs';
-import { Property } from 'src/app/ng-property';
+import { interval, Subject, Subscription } from 'rxjs';
 import { LoggerService } from 'src/app/modules/shared/services/logger.service';
 import { RaceService } from 'src/app/modules/racing/services/race/race.service';
 import { PlayObject, LetterObject } from '../../../../models/playobject.model';
 import { UiService } from 'src/app/modules/shared/services/ui/ui.service';
 import { ActivatedRoute, Params } from '@angular/router';
+import { GameStatus, GameType } from 'src/app/models/enums';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-race',
@@ -24,11 +25,13 @@ export class RaceComponent implements OnInit {
     this.route.queryParams.subscribe((d: Params) => this.gameType = d['type']);
   }
 
-  gameType: 'normal' | 'difficult' = 'normal';
+  closeSubs$ = new Subject();
+
+  gameType: GameType = GameType.Normal;
 
   @ViewChild('input', { static: false }) input!: ElementRef<HTMLInputElement>;
   typingArray: PlayObject[] = [];
-  gameStatus: 'game starting' | 'playing' | 'completed' = "game starting";
+  gameStatus: GameStatus = GameStatus.Starting;
   timer: number = 4;
   inputValue = "";
   currentObject!: PlayObject;
@@ -38,11 +41,10 @@ export class RaceComponent implements OnInit {
   totalSeconds = 0;
   score = 0;
   scoreInterval!: Subscription;
+  scoreCalfulateInterval = 2; /*In seconds*/
   //Subscriptions 
 
   startInterval!: Subscription;
-  fetchSubscription!: Subscription;
-
   //error
   error = false;
   typingError = false;
@@ -52,37 +54,40 @@ export class RaceComponent implements OnInit {
   currentLetterId!: number;
   errorLetters: string[] = [];
 
+
   ngOnInit(): void {
     this.initGame();
   }
 
   initGame() {
     let sub;
-    if (this.gameType == 'difficult') {
+    if (this.gameType == GameType.Difficult) {
       sub = this._raceService.fetchText();
     }
     else {
       sub = this._raceService.fetchQuotes();
     }
     this._uiService.loading.startLoading();
-    this.fetchSubscription = sub.subscribe(
-      quote => {
-        this.error = false;
-        this.emptyAll();
-        this.gameStatus = "playing";
-        this.typingArray = this._raceService.createRaceObject(quote.text!);
-        this._uiService.loading.stopLoading();
-        this.startTimer();
-      },
-      err => {
-        if (this.gameType = "normal") {
-          this.gameType = "difficult";
-          return this.initGame();
-        };
-        this._loggerService.consoleLog('Data Fetch Error RaceComponent', err);
-        this.error = true;
-      }
-    );
+    sub
+      .pipe(takeUntil(this.closeSubs$))
+      .subscribe(
+        quote => {
+          this.error = false;
+          this.emptyAll();
+          this.gameStatus = GameStatus.Playing;
+          this.typingArray = this._raceService.createRaceObject(quote.text!);
+          this._uiService.loading.stopLoading();
+          this.startTimer();
+        },
+        err => {
+          if (this.gameType = GameType.Normal) {
+            this.gameType = GameType.Difficult;
+            return this.initGame();
+          };
+          this._loggerService.consoleLog('Data Fetch Error RaceComponent', err);
+          this.error = true;
+        }
+      );
   }
 
   emptyAll() {
@@ -109,7 +114,7 @@ export class RaceComponent implements OnInit {
 
     if (obj.id + 1 == this.typingArray.length) {
       this.currentObject = <PlayObject>{};
-      this.gameStatus = "completed";
+      this.gameStatus = GameStatus.Completed;
       return this.calculateScore();
 
     }
@@ -133,7 +138,7 @@ export class RaceComponent implements OnInit {
     this.currentObject = this.typingArray[0];
 
     // this._raceService.postMessage(WM.calculateScore$, { typingArray: this.typingArray });
-    this.scoreInterval = interval(2000).subscribe(() => this.calculateScore());
+    this.scoreInterval = interval(this.scoreCalfulateInterval * 1000).subscribe(() => this.calculateScore());
 
     setTimeout(() => {
       this.input.nativeElement.focus();
@@ -143,27 +148,24 @@ export class RaceComponent implements OnInit {
 
   calculateScore() {
 
-    if (this.gameStatus == 'completed') {
+    if (this.gameStatus == GameStatus.Completed) {
       this.scoreInterval?.unsubscribe();
       return;
     }
-    // if (this._raceService.workerSupported) return this.calculateWithWorker();
-    this.totalSeconds += 2;
+    this.totalSeconds += this.scoreCalfulateInterval;
     let totalWordsTyped = this.typingArray?.indexOf(this.currentObject);
     this.score = parseInt((totalWordsTyped / (this.totalSeconds / 60)).toString());
   }
 
-  // calculateWithWorker() {
-  //   this._raceService.postMessage(WM.calculateScore$, this.currentObject);
-  // }
 
   restart() {
     this.initGame();
   }
 
   ngOnDestroy() {
-    this.fetchSubscription?.unsubscribe();
+    this.closeSubs$.next();
     this.scoreInterval?.unsubscribe();
+
   }
 
   handleOnPaste(e: any) {
